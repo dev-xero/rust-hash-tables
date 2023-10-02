@@ -174,8 +174,17 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
         }
     }
 
+    fn occupied_factor(&self) -> f64 {
+        if self.xs.is_empty() {
+            1.0
+        } else {
+            self.n_occupied as f64 / self.xs.len() as f64
+        }
+    }
+
     fn resize(&mut self) {
-        let new_size = max(64, self.xs.len()*2);
+        let resize_factor = if self.occupied_factor() > 0.75 { 2 } else { 1 };
+        let new_size = max(64, self.xs.len() * resize_factor);
         let mut new_table = Self {
             xs: (0..new_size).map(|_| Entry::Vacant).collect(),
             n_occupied: 0,
