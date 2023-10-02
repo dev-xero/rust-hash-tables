@@ -150,7 +150,11 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
     }
 
     fn load_factor(&self) -> f64 {
-        todo!()
+        if self.xs.is_empty() {
+            1.0
+        } else {
+            1.0 - self.n_vacant as f64 / self.xs.len() as f64
+        }
     }
 
     fn resize(&mut self) {
