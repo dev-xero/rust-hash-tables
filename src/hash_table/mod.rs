@@ -36,7 +36,23 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
         Key: Borrow<Q>,
         Q: Eq + Hash,
     {
-        todo!()
+        if self.len() == 0 {
+            return None
+        }
+        let mut idx = self.get_index(key);
+        loop {
+            match &self.xs[idx] {
+                Entry::Vacant => {
+                    break None;
+                }
+                Entry::Occupied { key: k, val } if k.borrow() == key => {
+                    break Some(val);
+                }
+                _ => {
+                    idx = (idx + 1) % self.xs.len();
+                }
+            }
+        }
     }
 
     pub fn get_mut<Q>(&mut self, key: &Q) -> Option<&mut Val>
