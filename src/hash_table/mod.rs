@@ -15,7 +15,11 @@ pub struct HashMap<Key, Val> {
 
 impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
     pub fn new() -> Self {
-        todo!()
+        Self {
+            xs: Vec::new(),
+            n_occupied: 0,
+            n_vacant: 0
+        }
     }
 
     pub fn len(&self) -> usize {
