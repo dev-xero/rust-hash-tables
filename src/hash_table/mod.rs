@@ -60,7 +60,22 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
         Key: Borrow<Q>,
         Q: Eq + Hash,
     {
-        todo!()
+        if self.len() == 0 {
+            return None;
+        }
+        let idx = self.get_index(key);
+        for entry in self.iter_mut_starting_at(idx) {
+            match entry {
+                Entry::Vacant => {
+                    return None;
+                }
+                Entry::Occupied { key: k, val } if (k as &Key).borrow() == key => {
+                    return Some(val);
+                }
+                _ => {}
+            }
+        }
+        panic!("Fatal: unreachable");
     }
 
     pub fn remove<Q>(&mut self, key: &Q) -> Option<Val>
@@ -80,5 +95,11 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
         let mut hasher = DefaultHasher::new();
         key.hash(&mut hasher);
         hasher.finish() as usize % self.xs.len()
+    }
+
+    fn iter_mut_starting_at(&mut self, idx: usize) -> impl Iterator<Item = &mut Entry<Key, Val>>
+    {
+        let (s1, s2) = self.xs.split_at_mut(idx);
+        s2.iter_mut().chain(s1.iter_mut())
     }
 }
