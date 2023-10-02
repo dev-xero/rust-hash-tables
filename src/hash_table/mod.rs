@@ -23,7 +23,7 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
     }
 
     pub fn len(&self) -> usize {
-        todo!()
+        self.n_occupied
     }
 
     pub fn insert(&mut self, key: Key, val: Val) -> Option<Val> {
