@@ -1,8 +1,16 @@
 use std::borrow::Borrow;
 use std::hash::Hash;
 
+pub enum Entry<Key, Val> {
+    Vacant,
+    Tombstone,
+    Occupied { key: Key, val: Val }
+}
+
 pub struct HashMap<Key, Val> {
-    // todo
+    xs: Vec<Entry<Key, Val>>,
+    n_occupied: usize,
+    n_vacant: usize
 }
 
 impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
