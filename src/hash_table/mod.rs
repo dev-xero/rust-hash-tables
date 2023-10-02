@@ -46,7 +46,11 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
     }
 
     pub fn insert(&mut self, key: Key, val: Val) -> Option<Val> {
-        todo!()
+        if self.load_factor() >= 0.75 {
+            self.resize();
+        }
+
+        self.insert_helper(key, val)
     }
 
     pub fn get<Q>(&self, key: &Q) -> Option<&Val> 
