@@ -1,5 +1,6 @@
 use std::borrow::Borrow;
-use std::hash::Hash;
+use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 
 pub enum Entry<Key, Val> {
     Vacant,
@@ -52,5 +53,16 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
         Q: Eq + Hash,
     {
         todo!()
+    }
+
+    // Helper functions
+    fn get_index<Q>(&self, key: &Q) -> usize
+    where
+        Key: Borrow<Q>,
+        Q: Eq + Hash,
+    {
+        let mut hasher = DefaultHasher::new();
+        key.hash(&mut hasher);
+        hasher.finish() as usize % self.xs.len()
     }
 }
