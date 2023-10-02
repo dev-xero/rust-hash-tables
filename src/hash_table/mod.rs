@@ -16,6 +16,7 @@ impl <Key, Val> Entry<Key, Val> {
             Self::Occupied { .. } => {
                 let mut occupied = Self::Tombstone;
                 swap(self, &mut occupied);
+
                 if let Self::Occupied { val, .. } = occupied {
                     Some(val)
                 } else {
@@ -62,7 +63,9 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
         if self.len() == 0 {
             return None
         }
+
         let mut idx = self.get_index(key);
+
         loop {
             match &self.xs[idx] {
                 Entry::Vacant => {
@@ -86,7 +89,9 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
         if self.len() == 0 {
             return None;
         }
+
         let idx = self.get_index(key);
+
         for entry in self.iter_mut_starting_at(idx) {
             match entry {
                 Entry::Vacant => {
@@ -98,6 +103,7 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
                 _ => {}
             }
         }
+
         panic!("Fatal: unreachable");
     }
 
@@ -165,6 +171,7 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
             n_occupied: 0,
             n_vacant: new_size
         };
+
         for entry in take(&mut self.xs) {
             if let Entry::Occupied { key, val } = entry {
                 new_table.insert_helper(key, val);
