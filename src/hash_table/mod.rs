@@ -26,6 +26,16 @@ impl <Key, Val> Entry<Key, Val> {
             _ => None
         }
     }
+
+    fn replace(&mut self, mut x: Val) -> Option<Val> {
+        match self {
+            Self::Occupied { val, .. } => {
+                swap(&mut x, val);
+                Some(x)
+            }
+            _ => None
+        }
+    }
 }
 
 pub struct HashMap<Key, Val> {
@@ -182,6 +192,23 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
     }
 
     fn insert_helper(&mut self, key: Key, val: Val) -> Option<Val> {
-        todo!()
+        let idx = self.get_index(&key);
+        let mut result = None;
+
+        for entry in self.iter_mut_starting_at(idx) {
+            match entry {
+                Entry::Occupied { key: k, .. } if (k as &Key).borrow() == &key => {
+                    result = entry.replace(val);
+                    break;
+                }
+                Entry::Vacant => {
+                    *entry = Entry::Occupied { key, val };
+                    break;
+                }
+                _ => {}
+            }
+        }
+
+        result
     }
 }
