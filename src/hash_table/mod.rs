@@ -1,7 +1,8 @@
 use std::borrow::Borrow;
+use std::cmp::max;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
-use std::mem::swap;
+use std::mem::{swap, take};
 
 pub enum Entry<Key, Val> {
     Vacant,
@@ -158,7 +159,19 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
     }
 
     fn resize(&mut self) {
-        todo!()
+        let new_size = max(64, self.xs.len()*2);
+        let mut new_table = Self {
+            xs: (0..new_size).map(|_| Entry::Vacant).collect(),
+            n_occupied: 0,
+            n_vacant: new_size
+        };
+        for entry in take(&mut self.xs) {
+            if let Entry::Occupied { key, val } = entry {
+                new_table.insert_helper(key, val);
+            }
+        }
+
+        swap(self, &mut new_table);
     }
 
     fn insert_helper(&mut self, key: Key, val: Val) -> Option<Val> {
