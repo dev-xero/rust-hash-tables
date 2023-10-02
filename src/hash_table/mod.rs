@@ -1,11 +1,29 @@
 use std::borrow::Borrow;
 use std::collections::hash_map::DefaultHasher;
 use std::hash::{Hash, Hasher};
+use std::mem::swap;
 
 pub enum Entry<Key, Val> {
     Vacant,
     Tombstone,
     Occupied { key: Key, val: Val }
+}
+
+impl <Key, Val> Entry<Key, Val> {
+    fn take(&mut self) -> Option<Val> {
+        match self {
+            Self::Occupied { .. } => {
+                let mut occupied = Self::Tombstone;
+                swap(self, &mut occupied);
+                if let Self::Occupied { val, .. } = occupied {
+                    Some(val)
+                } else {
+                    panic!("Fatal: unreachable");
+                }
+            }
+            _ => None
+        }
+    }
 }
 
 pub struct HashMap<Key, Val> {
@@ -83,7 +101,31 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
         Key: Borrow<Q>,
         Q: Eq + Hash,
     {
-        todo!()
+        if self.len() == 0 {
+            return None;
+        }
+
+        let idx = self.get_index(key);
+        let mut result = None;
+
+        for entry in self.iter_mut_starting_at(idx) {
+            match entry {
+                Entry::Occupied { key: k, .. } if (k as &Key).borrow() == key => {
+                    result = entry.take();
+                    break;
+                }
+                Entry::Vacant => {
+                    result = None;
+                    break;
+                }
+                _ => {}
+            }
+        }
+        
+        result.map(|val| {
+            self.n_occupied -= 1;
+            val
+        })
     }
 
     // Helper functions
