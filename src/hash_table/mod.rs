@@ -121,7 +121,7 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
                 _ => {}
             }
         }
-        
+
         result.map(|val| {
             self.n_occupied -= 1;
             val
@@ -143,5 +143,17 @@ impl <Key: Eq + Hash, Val> HashMap<Key, Val> {
     {
         let (s1, s2) = self.xs.split_at_mut(idx);
         s2.iter_mut().chain(s1.iter_mut())
+    }
+
+    fn load_factor(&self) -> f64 {
+        todo!()
+    }
+
+    fn resize(&mut self) {
+        todo!()
+    }
+
+    fn insert_helper(&mut self, key: Key, val: Val) -> Option<Val> {
+        todo!()
     }
 }
